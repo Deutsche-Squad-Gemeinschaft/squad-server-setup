@@ -3,10 +3,10 @@
 
 <#
  .Synopsis
-  Implements everything related to Squad (servers).
+  Implements everything related to Squad.
 
  .Description
-  This is the "virtual" representation of a Squad server instance.
+  This is the "virtual" representation of Squad and any logic related to it.
 #>
 class Squad {
     [string]$basePath   = "SquadGame"
