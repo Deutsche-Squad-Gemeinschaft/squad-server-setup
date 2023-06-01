@@ -10,27 +10,28 @@
 #>
 class Steam-CMD {
   [string]$installDir
-  [int]$appId = 403240
+  [int]$gameAppId        = 393380
+  [int]$serverAppId      = 403240
+  [string[]]$subCommands = @()
 
-  [void] updateApp(){
-    # TODO
+  Steam-CMD ([string] $installDir) {
+    $this.installDir = $installDir
   }
 
-  [void] updateMods([string[]] $modIds){
-    # Initialize our command array
-    CMD = @()
+  [void] UpdateApp(){
+    # Add the sub-command to update the application
+    $this.subCommands += "+app_update $($this.appId) validate"
+  }
 
-    # Iterate trough all provided Mods
+  [void] UpdateMods([string[]] $modIds){
+    # Iterate trough the provided Mods
     foreach ($modId in $modIds) {
-      # Add the command to download the workshop item 
-      CMD += "+workshop_download_item 393380 $modId"
+      # Add the command to update the workshop item 
+      $this.subCommands += "+workshop_download_item $($this.gameAppId) $modId"
     }
-
-    # Join all SteamCMD sub-commands and run SteamCMD
-    $this.Run($CMD -join " ")
   }
 
-  [void] run ([string] $command) {
+  [void] Run () {
     # Initialize our command array and start it with the SteamCMD executable
     CMD = @("steamcmd")
 
@@ -41,7 +42,7 @@ class Steam-CMD {
     CMD += "+login anonymous"
 
     # Add all SteamCMD sub-command(s) that have been provided
-    CMD += $command -join " "
+    CMD += $this.subCommands -join " "
 
     # Make sure to quit SteamCMD as the very last command
     CMD += "+quit"
