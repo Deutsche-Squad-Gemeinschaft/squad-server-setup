@@ -51,5 +51,3 @@ class Steam-CMD {
     Invoke-Expression $($CMD -join " ")
   }
 }
-
-Export-ModuleMember -Function Steam-CMD

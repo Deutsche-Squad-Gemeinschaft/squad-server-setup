@@ -21,5 +21,3 @@ class Service {
         # TODO
     }
 }
-
-Export-ModuleMember -Function Service

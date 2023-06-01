@@ -14,4 +14,3 @@ class Squad {
     [string]$modsPath   = "$basePath/Plugins/Mods"
 }
 
-Export-ModuleMember -Function Squad

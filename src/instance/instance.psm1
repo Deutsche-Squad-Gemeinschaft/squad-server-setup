@@ -32,5 +32,3 @@ class Instance {
         return Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "instances/$($this.name)"
     }
 }
-
-Export-ModuleMember -Function Instance
