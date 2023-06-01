@@ -14,3 +14,6 @@
 #
 # Author: Deutsche Squad Gemeinschaft
 # License: GPLv3
+
+# Set the path to the setup root directory
+[Environment]::SetEnvironmentVariable("SQUAD_SETUP_ROOT", Join-Path -Path $PSScriptRoo -ChildPath "..")
