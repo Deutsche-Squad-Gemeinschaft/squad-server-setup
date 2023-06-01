@@ -9,10 +9,10 @@
   This is the "virtual" representation of SteamCMD meant to handle command batching.
 #>
 class Steam-CMD {
-  [string]$installDir
-  [int]$gameAppId        = 393380
-  [int]$serverAppId      = 403240
-  [string[]]$subCommands = @()
+  [string] $installDir    = Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "squad"
+  [int] $gameAppId        = 393380
+  [int] $serverAppId      = 403240
+  [string[]] $subCommands = @()
 
   Steam-CMD ([string] $installDir) {
     $this.installDir = $installDir
