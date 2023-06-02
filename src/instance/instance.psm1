@@ -34,4 +34,15 @@ class Instance {
     static [string] Directory([string] $name) {
         return Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "configs/$name"
     }
+
+    static [void] CallHook([string] $name, [string] $hook) {
+        # Build the file path for the event hook
+        $filePath = Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "instances/$instance/afterStart"
+
+        # make sure the event hook does exist
+        if (Test-Path -Path $filePath) {
+            # Run the event hook
+            & $filePath
+        }
+    }
 }
