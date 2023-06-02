@@ -2,7 +2,7 @@
 This repository contains the structure as well as any executables required to install, manage and run a Squad server on Linux and Windows using PowerShell as a cross-platform scripting language.
 
 ## Requirements
-- PowerShell
+- [PowerShell](https://github.com/PowerShell/PowerShell)
 
 ## Contibuting
 Contributions in the form of Issues and Pull Requests are always welcomed.
