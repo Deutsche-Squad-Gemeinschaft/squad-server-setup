@@ -13,4 +13,3 @@ class Squad {
     [string]$configPath = "$basePath/ServerConfig"
     [string]$modsPath   = "$basePath/Plugins/Mods"
 }
-

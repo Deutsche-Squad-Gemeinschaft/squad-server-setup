@@ -8,12 +8,25 @@
 # https://learn.microsoft.com/en-us/windows/win32/procthread/environment-variables
 #
 # Usage:
-#  > sqm -instance public start
-#  > sqm -instance public stop
-#  > sqm -instance public restart
+#  > sqm create
 #
 # Author: Deutsche Squad Gemeinschaft
 # License: GPLv3
+#
+#requires -Version 3
+PARAM (
+  [string]$subCommand
+)
 
 # Set the path to the setup root directory
-[Environment]::SetEnvironmentVariable("SQUAD_SETUP_ROOT", Join-Path -Path $PSScriptRoo -ChildPath "..")
+[Environment]::SetEnvironmentVariable("SQUAD_SETUP_ROOT", Join-Path -Path $PSScriptRoot -ChildPath "..")
+
+# Find and run the sub command
+if (! $subCommand) {
+    foreach($_ in Get-ChildItem $PSScriptRoot\commands -Name) {
+        [System.IO.Path]::GetFileNameWithoutExtension($_)
+    }
+    return
+}
+
+& "$PSScriptRoot\Command\$subCommand.ps1" @args
