@@ -8,13 +8,13 @@
  .Description
   This is the "virtual" representation of SteamCMD meant to handle command batching.
 #>
-class Steam-CMD {
-  [string] $installDir    = Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "squad"
+class SteamCMD {
+  [string] $installDir    = $(Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "squad")
   [int] $gameAppId        = 393380
   [int] $serverAppId      = 403240
   [string[]] $subCommands = @()
 
-  Steam-CMD ([string] $installDir) {
+  SteamCMD ([string] $installDir) {
     $this.installDir = $installDir
   }
 
@@ -33,19 +33,19 @@ class Steam-CMD {
 
   [void] Run () {
     # Initialize our command array and start it with the SteamCMD executable
-    CMD = @("steamcmd")
+    $CMD = @("steamcmd")
 
     # Set force_install_dir before login
-    CMD += "+force_install_dir $($this.installDir)"
+    $CMD += "+force_install_dir $($this.installDir)"
 
     # Login anonymously
-    CMD += "+login anonymous"
+    $CMD += "+login anonymous"
 
     # Add all SteamCMD sub-command(s) that have been provided
-    CMD += $this.subCommands -join " "
+    $CMD += $this.subCommands -join " "
 
     # Make sure to quit SteamCMD as the very last command
-    CMD += "+quit"
+    $CMD += "+quit"
 
     # Join the final command and run it
     Invoke-Expression $($CMD -join " ")
