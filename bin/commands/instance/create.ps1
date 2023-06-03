@@ -1,4 +1,5 @@
 using module '../../src/instance/instance.psm1'
+using module '../../src/utils/path.psm1'
 
 PARAM (
   [string] $instance
