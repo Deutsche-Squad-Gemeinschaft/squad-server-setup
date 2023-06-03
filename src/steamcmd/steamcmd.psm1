@@ -1,5 +1,6 @@
 # Author: Deutsche Squad Gemeinschaft
 # License: GPLv3
+using module '../utils/path.psm1'
 
 <#
  .Synopsis
@@ -9,7 +10,7 @@
   This is the "virtual" representation of SteamCMD meant to handle command batching.
 #>
 class SteamCMD {
-  [string] $installDir    = $(Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "squad")
+  [string] $installDir    = $([Path]::SetupDir('squad'))
   [int] $gameAppId        = 393380
   [int] $serverAppId      = 403240
   [string[]] $subCommands = @()

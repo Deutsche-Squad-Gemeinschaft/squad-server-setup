@@ -1,6 +1,7 @@
 # Author: Deutsche Squad Gemeinschaft
 # License: GPLv3
 using module '../service/service.psm1'
+using module '../utils/path.psm1'
 
 <#
  .Synopsis
@@ -23,7 +24,7 @@ class Instance {
 
     [void] CallHook([string] $hook) {
         # Build the file path for the event hook
-        $filePath = Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "instances/$($this.name)/afterStart"
+        $filePath = [Path]::SetupDir("instances/$($this.name)/afterStart")
 
         # make sure the event hook does exist
         if (Test-Path -Path $filePath) {
@@ -47,18 +48,18 @@ class Instance {
     }
 
     static [string] ConfigDirectory([string] $name) {
-        return Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "configs/$name"
+        return [Path]::SetupDir("configs/$name")
     }
 
     static [string] RuntimeDirectory([string] $name) {
-        return Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "runtimes/$name"
+        return [Path]::SetupDir("runtimes/$name")
     }
 
     static [string] Executable([string] $name) {
         if ($global:IsWindows) {
-            return Join-Path -Path [Environment]::RuntimeDirectory($name) -ChildPath "SquadGameServer.exe"
+            return [Path]::Normalize("$([Instance]::RuntimeDirectory($name))/SquadGameServer.exe")
         } elseif ($global:IsLinux) {
-            return Join-Path -Path [Environment]::RuntimeDirectory($name) -ChildPath "SquadGameServer.sh"
+            return [Path]::Normalize("$([Instance]::RuntimeDirectory($name))/SquadGameServer.sh")
         } else {
             throw 'The currently used operating system is not supported!'
         }

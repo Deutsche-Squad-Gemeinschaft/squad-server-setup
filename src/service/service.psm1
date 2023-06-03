@@ -1,6 +1,7 @@
 # Author: Deutsche Squad Gemeinschaft
 # License: GPLv3
 using module '../instance/instance.psm1'
+using module '../utils/path.psm1'
 
 <#
  .Synopsis
@@ -72,7 +73,7 @@ class Service {
         if ($global:IsWindows) {
             SC create "squad-$name" \
                 -displayname "Squad Server Instance $name"  \
-                -binpath "$(Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "bin/SquadGameServer.ps1") -instance $name" \
+                -binpath "$([Path]::SetupDir('bin/SquadGameServer.ps1')) -instance $name" \
                 -type own \
                 -start auto
         } elseif ($global:IsLinux) {
@@ -92,11 +93,10 @@ Description=Squad Server Instance $name
 After=network.target
 
 [Service]
-WorkingDirectory=$([Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT"))/runtimes/$name
+WorkingDirectory=$([Instance]::RuntimeDirectory($name))
 Type=simple
 TimeoutSec=300
-ExecStartPre=$([Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT"))/bin/prepare.ps1
-ExecStart=$([Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT"))/bin/SquadGameServer.ps1 -instance $name
+ExecStart=$([Path]::SetupDir('bin/SquadGameServer.ps1')) -instance $name
 ExecStop=/bin/kill -2 `$MAINPID
 Restart=on-failure
 RestartSec=5s
