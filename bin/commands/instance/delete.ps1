@@ -2,11 +2,8 @@ using module '../../src/steamcmd/steamcmd.psm1'
 using module '../../src/utils/path.psm1'
 
 PARAM (
-  #[string] $type
+  [string] $instance
 )
-
-# Initialize a SteamCMD object
-$S = [SteamCMD]::new()
 
 # Verify the instance directory does exist
 if (-not [Path]::Exists([Instance]::Directory($instance))) {
@@ -16,12 +13,12 @@ if (-not [Path]::Exists([Instance]::Directory($instance))) {
 # Ask for confirmation to delete the Instance
 if ($(Read-Host "Are you sure you want to DELETE the instance?") -eq 'y') {
   # Remove configuration directory
-  if ([Path]::Exists([Instance]::ConfigDirectory($name))) {
-    Remove-Item -Recurse -Path [Instance]::ConfigDirectory($name)
+  if ([Path]::Exists([Instance]::ConfigDirectory($instance))) {
+    Remove-Item -Recurse -Path [Instance]::ConfigDirectory($instance)
   }
   
   # Remove the runtime directory
-  if ([Path]::Exists([Instance]::RuntimeDirectory($name))) {
-    Remove-Item -Recurse -Path [Instance]::RuntimeDirectory($name)
+  if ([Path]::Exists([Instance]::RuntimeDirectory($instance))) {
+    Remove-Item -Recurse -Path [Instance]::RuntimeDirectory($instance)
   }
 }
