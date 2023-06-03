@@ -1,5 +1,6 @@
 # Author: Deutsche Squad Gemeinschaft
 # License: GPLv3
+using module '../service/service.psm1'
 
 <#
  .Synopsis
@@ -32,11 +33,14 @@ class Instance {
     }
 
     static [Instance] Create ([string] $name) {
-        # Create instance directory if it does not already exist
+        # Create Instance directory if it does not already exist
         New-Item -ItemType Directory -Force -Path [Instance]::ConfigDirectory($name)
 
-        # Populate new instance directory with base files from the skeleton
+        # Populate new Instance directory with base files from the skeleton
         Copy-Item [Instance]::ConfigDirectory(".skeleton") -Destination [Instance]::ConfigDirectory($name)
+
+        # Create the Instance service file
+        [Service]::Create($name)
 
         # Return instance of Instance
         return [Instance]::new($name)
