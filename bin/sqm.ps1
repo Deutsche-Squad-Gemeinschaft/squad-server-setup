@@ -14,19 +14,32 @@
 # License: GPLv3
 #
 #requires -Version 3
-PARAM (
-  [string]$subCommand
-)
+using module '../src/utils/path.psm1'
 
 # Prepare everything first
 & "$PSScriptRoot/../src/bootstrap.ps1"
 
-# Find and run the sub command
-if (! $subCommand) {
-    foreach($_ in Get-ChildItem $PSScriptRoot\commands -Name) {
-        [System.IO.Path]::GetFileNameWithoutExtension($_)
+function runCommand ([string] $path, [int] $level = 0) {
+  foreach($child in Get-ChildItem $path) {
+    # Check if the current argument is a sub-directory
+    if ((Get-item $child) -is [System.IO.DirectoryInfo]) {
+      # Search sub command using the next argument
+      runCommand($child, $level + 1)
+
+      # Stop further search
+      break
     }
-    return
+
+    # Check if the current argument is a file
+    if ((Get-item $child) -is [System.IO.FileInfo]) {
+      # Run the command
+      & $child @args
+
+      # Stop further search
+      break
+    }
+  }
 }
 
-& "$PSScriptRoot\Command\$subCommand.ps1" @args
+# Try to run the command starting from ./commands directory
+runCommand([Path]::SetupDir('bin/commands'))
