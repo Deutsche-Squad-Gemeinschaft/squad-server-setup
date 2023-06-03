@@ -16,4 +16,8 @@ class Path {
         # Use GetFullPath to replace invalid characters
         return [IO.Path]::GetFullPath($path)
     }
+
+    static [boolean] Exists ([string] $path) {
+        return Test-Path -Path [Path]::Normalize($path)
+    }
 }

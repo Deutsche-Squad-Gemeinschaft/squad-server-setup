@@ -17,7 +17,7 @@ class Instance {
         $this.name = $name;
 
         # Make sure the instance directory does exist
-        if (-Not (Test-Path -Path $this.ConfigDirectory($this.name))) {
+        if (-not [Path]::Exists([Instance]::ConfigDirectory($this.name))) {
             throw "Could not initialize Instance, config directory $($this.ConfigDirectory($this.name)) does not exist!"
         }
     }
@@ -27,7 +27,7 @@ class Instance {
         $filePath = [Path]::SetupDir("instances/$($this.name)/afterStart")
 
         # make sure the event hook does exist
-        if (Test-Path -Path $filePath) {
+        if ([Path]::Exists($filePath)) {
             # Run the event hook
             & $filePath
         }

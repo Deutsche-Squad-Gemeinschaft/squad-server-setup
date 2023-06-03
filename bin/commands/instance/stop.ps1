@@ -5,7 +5,7 @@ PARAM (
 )
 
 # Verify the instance configuration directory does exist
-if (Test-Path -Path $this.Directory($instance)) {
+if ([Path]::Exists([Instance]::Directory($instance))) {
     throw "Instance $instance does already exist!"
 }
 
