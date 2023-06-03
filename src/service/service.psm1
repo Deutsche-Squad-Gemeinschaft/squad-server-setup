@@ -1,5 +1,6 @@
 # Author: Deutsche Squad Gemeinschaft
 # License: GPLv3
+using module '../instance/instance.psm1'
 
 <#
  .Synopsis
@@ -9,42 +10,59 @@
   This Class i meant to abstract usage of SystemD / sc.exe.
 #>
 class Service {
-    static [void] Start([string] $name){
+    static [void] Start([string] $instance){
+        # Initialize the Instance object
+        $I = [Instance]::new($instance)
+
+        # Trigger the beforeStart event hook
+        $I::CallHook('beforeStart')
+
+        # Start the service depdending on the OS
         if ($global:IsWindows) {
-            SC start "squad-$name"
+            SC start "squad-$instance"
         } elseif ($global:IsLinux) {
-            systemctl --user start "$name.service"
+            systemctl --user start "squad-$instance.service"
         } else {
             throw 'The currently used operating system is not supported!'
         }
+
+        # Trigger the afterStart event hook
+        $I::CallHook('afterStart')
     }
 
-    static [void] Restart([string] $name){
+    static [void] Stop([string] $instance){
+        # Initialize the Instance object
+        $I = [Instance]::new($instance)
+
+        # Trigger the beforeStop event hook
+        $I::CallHook('beforeStop')
+
+        # Stop the service depdending on the OS
         if ($global:IsWindows) {
-            [Service]::stop($name)
-            [Service]::start($name)
+            SC stop "squad-$instance"
         } elseif ($global:IsLinux) {
-            systemctl --user restart "$name.service"
+            systemctl --user stop "squad-$instance.service"
         } else {
             throw 'The currently used operating system is not supported!'
         }
+
+        # Trigger the beforeStop event hook
+        $I::CallHook('beforeStop')
     }
 
-    static [void] Stop([string] $name){
-        if ($global:IsWindows) {
-            SC stop "squad-$name"
-        } elseif ($global:IsLinux) {
-            systemctl --user stop "$name.service"
-        } else {
-            throw 'The currently used operating system is not supported!'
-        }
+    static [void] Restart([string] $instance){
+        # use our existing implementation to stop the service
+        [Instance]::Stop($instance)
+
+        # use our existing implementation to start the service
+        [Instance]::Start($instance)
     }
 
     static [void] Status([string] $name){
         if ($global:IsWindows) {
             SC query "squad-$name"
         } elseif ($global:IsLinux) {
-            systemctl --user status "$name.service"
+            systemctl --user status "squad-$name.service"
         } else {
             throw 'The currently used operating system is not supported!'
         }
@@ -62,7 +80,7 @@ class Service {
             New-Item -ItemType Directory -Force -Path "$([Environment]::GetEnvironmentVariable('HOME'))/.config/systemd/user"
 
             # Build the service file path for further use
-            $serviceFile = '$HOME/.config/systemd/user/squad-$name.service'
+            $serviceFile = "$([Environment]::GetEnvironmentVariable('HOME'))/.config/systemd/user/squad-$name.service"
 
             # Create a new SystemD user service definition
             New-Item $serviceFile

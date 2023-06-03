@@ -7,8 +7,8 @@ PARAM (
 # Initialize the Instance
 $I = [Instance]::ConfigDirectory($name)
 
-# Verify the instance folder does not already exist
-if (-Not (Test-Path -Path $this.Directory($instance))) {
+# Verify the instance directory does exist
+if (Test-Path -Path $this.Directory($instance)) {
   throw "Instance configuration for $instance does not exist!"
 }
 

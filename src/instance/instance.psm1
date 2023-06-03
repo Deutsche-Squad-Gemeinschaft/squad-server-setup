@@ -31,11 +31,6 @@ class Instance {
         }
     }
 
-    [void] Run() {
-        # Run this instance executable
-        & [Instance]::Executable($this.name)
-    }
-
     static [Instance] Create ([string] $name) {
         # Create instance directory if it does not already exist
         New-Item -ItemType Directory -Force -Path [Instance]::ConfigDirectory($name)
