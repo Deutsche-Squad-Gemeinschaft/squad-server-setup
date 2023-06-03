@@ -51,4 +51,9 @@ class SteamCMD {
     # Join the final command and run it
     Invoke-Expression $($CMD -join " ")
   }
+
+  [string[]] KnownMods () {
+    # Check what mods are available in the unmodified master
+    return Get-ChildItem -Directory -Path [Path]::SetupDir('squad/steamapps/workshop/content/393380') | Select-Object Name
+  }
 }
