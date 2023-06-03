@@ -20,7 +20,7 @@ using module '../src/utils/path.psm1'
 & "$PSScriptRoot/../src/bootstrap.ps1"
 
 function runCommand ([string] $path, [int] $level = 0) {
-  foreach($child in Get-ChildItem $path) {
+  foreach($child in Get-ChildItem -Path $path) {
     # Check if the current argument is a sub-directory
     if ((Get-item $child) -is [System.IO.DirectoryInfo]) {
       # Search sub command using the next argument
