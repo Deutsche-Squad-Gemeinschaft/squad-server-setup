@@ -10,9 +10,9 @@
 #>
 class Service {
     static [void] Start([string] $name){
-        if ($IsWindows) {
-
-        } else if ($IsLinux) {
+        if ($global:IsWindows) {
+            SC start "squad-$name"
+        } elseif ($global:IsLinux) {
             systemctl --user start "$name.service"
         } else {
             throw 'The currently used operating system is not supported!'
@@ -20,9 +20,10 @@ class Service {
     }
 
     static [void] Restart([string] $name){
-        if ($IsWindows) {
-
-        } else if ($IsLinux) {
+        if ($global:IsWindows) {
+            [Service]::stop($name)
+            [Service]::start($name)
+        } elseif ($global:IsLinux) {
             systemctl --user restart "$name.service"
         } else {
             throw 'The currently used operating system is not supported!'
@@ -30,9 +31,9 @@ class Service {
     }
 
     static [void] Stop([string] $name){
-        if ($IsWindows) {
-
-        } else if ($IsLinux) {
+        if ($global:IsWindows) {
+            SC stop "squad-$name"
+        } elseif ($global:IsLinux) {
             systemctl --user stop "$name.service"
         } else {
             throw 'The currently used operating system is not supported!'
@@ -40,9 +41,9 @@ class Service {
     }
 
     static [void] Status([string] $name){
-        if ($IsWindows) {
-
-        } else if ($IsLinux) {
+        if ($global:IsWindows) {
+            SC query "squad-$name"
+        } elseif ($global:IsLinux) {
             systemctl --user status "$name.service"
         } else {
             throw 'The currently used operating system is not supported!'
@@ -50,9 +51,13 @@ class Service {
     }
 
     static [void] Create ([string] $name) {
-        if ($IsWindows) {
-
-        } else if ($IsLinux) {
+        if ($global:IsWindows) {
+            SC create "squad-$name" \
+                -displayname "Squad Server Instance $name"  \
+                -binpath "$(Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "bin/SquadGameServer.ps1") -instance $name" \
+                -type own \
+                -start auto
+        } elseif ($global:IsLinux) {
             # Create user services directory if it does not already exist
             New-Item -ItemType Directory -Force -Path "$([Environment]::GetEnvironmentVariable('HOME'))/.config/systemd/user"
 
@@ -73,8 +78,8 @@ WorkingDirectory=$([Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT"))/ru
 Type=simple
 TimeoutSec=300
 ExecStartPre=$([Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT"))/bin/prepare.ps1
-ExecStart=$([Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT"))/runtimes/$name/SquadGameServer.sh
-ExecStop=/bin/kill -2 $MAINPID
+ExecStart=$([Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT"))/bin/SquadGameServer.ps1 -instance $name
+ExecStop=/bin/kill -2 `$MAINPID
 Restart=on-failure
 RestartSec=5s
 

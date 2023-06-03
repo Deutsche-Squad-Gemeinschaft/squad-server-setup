@@ -8,6 +8,9 @@ PARAM (
   [string] $instance
 )
 
+# Prepare everything first
+& "$PSScriptRoot/../src/bootstrap.ps1"
+
 # Clear instance runtime
 # TODO: Delete instance runtime directory
 

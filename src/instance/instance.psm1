@@ -15,34 +15,53 @@ class Instance {
         $this.name = $name;
 
         # Make sure the instance directory does exist
-        if (-Not (Test-Path -Path $this.Directory($this.name))) {
-            throw "Could not initialize Instance, directory $($this.Directory($this.name)) does not exist!"
+        if (-Not (Test-Path -Path $this.ConfigDirectory($this.name))) {
+            throw "Could not initialize Instance, config directory $($this.ConfigDirectory($this.name)) does not exist!"
         }
     }
 
-    static [Instance] Create ([string] $name) {
-        # Create instance directory if it does not already exist
-        New-Item -ItemType Directory -Force -Path $this.Directory($name)
-
-        # Populate new instance directory with base files from the skeleton
-        Copy-Item $this.Directory(".skeleton") -Destination $this.Directory($name)
-
-        # Return instance of Instance
-        return [Instance]::new($name)
-    }
-
-    static [string] Directory([string] $name) {
-        return Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "configs/$name"
-    }
-
-    static [void] CallHook([string] $name, [string] $hook) {
+    [void] CallHook([string] $hook) {
         # Build the file path for the event hook
-        $filePath = Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "instances/$instance/afterStart"
+        $filePath = Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "instances/$($this.name)/afterStart"
 
         # make sure the event hook does exist
         if (Test-Path -Path $filePath) {
             # Run the event hook
             & $filePath
+        }
+    }
+
+    [void] Run() {
+        # Run this instance executable
+        & [Instance]::Executable($this.name)
+    }
+
+    static [Instance] Create ([string] $name) {
+        # Create instance directory if it does not already exist
+        New-Item -ItemType Directory -Force -Path [Instance]::ConfigDirectory($name)
+
+        # Populate new instance directory with base files from the skeleton
+        Copy-Item [Instance]::ConfigDirectory(".skeleton") -Destination [Instance]::ConfigDirectory($name)
+
+        # Return instance of Instance
+        return [Instance]::new($name)
+    }
+
+    static [string] ConfigDirectory([string] $name) {
+        return Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "configs/$name"
+    }
+
+    static [string] RuntimeDirectory([string] $name) {
+        return Join-Path -Path [Environment]::GetEnvironmentVariable("SQUAD_SETUP_ROOT") -ChildPath "runtimes/$name"
+    }
+
+    static [string] Executable([string] $name) {
+        if ($global:IsWindows) {
+            return Join-Path -Path [Environment]::RuntimeDirectory($name) -ChildPath "SquadGameServer.exe"
+        } elseif ($global:IsLinux) {
+            return Join-Path -Path [Environment]::RuntimeDirectory($name) -ChildPath "SquadGameServer.sh"
+        } else {
+            throw 'The currently used operating system is not supported!'
         }
     }
 }

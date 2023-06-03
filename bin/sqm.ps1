@@ -18,8 +18,8 @@ PARAM (
   [string]$subCommand
 )
 
-# Set the path to the setup root directory
-[Environment]::SetEnvironmentVariable("SQUAD_SETUP_ROOT", Join-Path -Path $PSScriptRoot -ChildPath "..")
+# Prepare everything first
+& "$PSScriptRoot/../src/bootstrap.ps1"
 
 # Find and run the sub command
 if (! $subCommand) {
