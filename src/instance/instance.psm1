@@ -22,7 +22,7 @@ class Instance {
         }
     }
 
-    [void] CallHook([string] $hook) {
+    [void] CallHook ([string] $hook) {
         # Build the file path for the event hook
         $filePath = [Path]::SetupDir("instances/$($this.name)/afterStart")
 
@@ -33,9 +33,22 @@ class Instance {
         }
     }
 
-    [void] Prepare() {
+    [void] Prepare () {
         # Link game files
         [Path]::stow([Path]::SetupDir('squad'), [Instance]::RuntimeDirectory($this.name), @())
+    }
+
+    [void] Delete () {
+        # Delete the Instance service file / definition
+        [Service]::Delete($this.name)
+
+        # Remove configuration directory
+        Remove-Item -Recurse -Path [Instance]::ConfigDirectory($this.name)
+        
+        # Remove the runtime directory (if it exists)
+        if ([Path]::Exists([Instance]::RuntimeDirectory($this.name))) {
+            Remove-Item -Recurse -Path [Instance]::RuntimeDirectory($this.name)
+        }
     }
 
     static [Instance] Create ([string] $name) {
@@ -52,15 +65,15 @@ class Instance {
         return [Instance]::new($name)
     }
 
-    static [string] ConfigDirectory([string] $name) {
+    static [string] ConfigDirectory ([string] $name) {
         return [Path]::SetupDir("configs/$name")
     }
 
-    static [string] RuntimeDirectory([string] $name) {
+    static [string] RuntimeDirectory ([string] $name) {
         return [Path]::SetupDir("runtimes/$name")
     }
 
-    static [string] Executable([string] $name) {
+    static [string] Executable ([string] $name) {
         if ($global:IsWindows) {
             return [Path]::Normalize("$([Instance]::RuntimeDirectory($name))/SquadGameServer.exe")
         } elseif ($global:IsLinux) {

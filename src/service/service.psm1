@@ -78,10 +78,10 @@ class Service {
                 -start auto
         } elseif ($global:IsLinux) {
             # Create user services directory if it does not already exist
-            New-Item -ItemType Directory -Force -Path "$([Environment]::GetEnvironmentVariable('HOME'))/.config/systemd/user"
+            New-Item -ItemType Directory -Force -Path [Path]::Normalize("$([Environment]::GetEnvironmentVariable('HOME'))/.config/systemd/user")
 
             # Build the service file path for further use
-            $serviceFile = "$([Environment]::GetEnvironmentVariable('HOME'))/.config/systemd/user/squad-$name.service"
+            $serviceFile = [Service]::File($name)
 
             # Create a new SystemD user service definition
             New-Item $serviceFile
@@ -104,6 +104,31 @@ RestartSec=5s
 [Install]
 WantedBy=multi-user.target
 "@
+        } else {
+            throw 'The currently used operating system is not supported!'
+        }
+    }
+
+    static [void] Delete ([string] $name) {
+        # Make sure the Service is stopped
+        [Service]::Stop($name)
+        
+        # Delete the Service depending on the OS
+        if ($global:IsWindows) {
+            SC delete "squad-$name"
+        } elseif ($global:IsLinux) {
+            # Build the service file path for further use
+            Remove-Item -Force -Path [Service]::File($name)
+        } else {
+            throw 'The currently used operating system is not supported!'
+        }
+    }
+
+    static [string] File ([string] $name) {
+        if ($global:IsWindows) {
+            throw 'There is no Service file on Windows, this is Linux only!'
+        } elseif ($global:IsLinux) {
+            return [Path]::Normalize("$([Environment]::GetEnvironmentVariable('HOME'))/.config/systemd/user/squad-$name.service")
         } else {
             throw 'The currently used operating system is not supported!'
         }

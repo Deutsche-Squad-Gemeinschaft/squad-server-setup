@@ -10,5 +10,5 @@ if ([Path]::Exists([Instance]::Directory($instance))) {
   throw "Instance $instance does already exist!"
 }
 
-# Create the instance
+# Stop the instance
 [Service]::Stop($instance)
