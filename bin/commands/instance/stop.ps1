@@ -7,7 +7,7 @@ PARAM (
 
 # Verify the instance configuration directory does exist
 if ([Path]::Exists([Instance]::Directory($instance))) {
-    throw "Instance $instance does already exist!"
+  throw "Instance $instance does already exist!"
 }
 
 # Create the instance

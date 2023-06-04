@@ -33,6 +33,11 @@ class Instance {
         }
     }
 
+    [void] Prepare() {
+        # Link game files
+        [Path]::stow([Path]::SetupDir('squad'), [Instance]::RuntimeDirectory($this.name), @())
+    }
+
     static [Instance] Create ([string] $name) {
         # Create Instance directory if it does not already exist
         New-Item -ItemType Directory -Force -Path [Instance]::ConfigDirectory($name)
